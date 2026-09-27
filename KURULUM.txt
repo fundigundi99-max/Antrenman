@@ -1,0 +1,19 @@
+ÜST/ALT 4 GÜN - TELEFONA KURULUM (internetsiz çalışır)
+
+Bu klasör bir web uygulamasıdır (PWA). Telefona bir kez kurmak için
+klasörün internette bir kez yayınlanması gerekir, sonra internetsiz çalışır.
+
+1) ZIP'i bilgisayarda aç. "antrenman-app" klasörü çıkacak.
+2) Ücretsiz bir statik site servisine klasörü yükle, örneğin:
+   - Netlify Drop: app.netlify.com/drop adresine klasörü sürükle-bırak
+   - ya da GitHub Pages / Cloudflare Pages
+3) Verilen linki telefonda aç:
+   - iPhone (Safari): Paylaş > "Ana Ekrana Ekle"
+   - Android (Chrome): Menü (⋮) > "Uygulamayı yükle" / "Ana ekrana ekle"
+4) Uygulamayı bir kez internet varken aç. Artık uçak modunda da açılır.
+
+Not: YouTube videoları için internet gerekir. İşaretlediğin hareketler
+ve seçtiğin günler telefonda saklanır.
+
+Bilgisayarda internetsiz denemek için index.html dosyasını tarayıcıda
+açman da yeterli.

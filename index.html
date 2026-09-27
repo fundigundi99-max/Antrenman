@@ -1,0 +1,695 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16202A"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Antrenman">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}</style>
+</head><body><title>Üst/Alt 4 Gün</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="three.min.js"></script>
+<style>
+:root{
+  --bg:#EDF0F2; --surface:#FFFFFF; --ink:#16202A; --muted:#5B6874; --line:#D6DCE1; --ghost:#A7B1BA; --soft:#F4F6F8;
+  --mus:#C3CBD2; --bodyn:#E2E7EB; --fig3d:#8C97A1; --plate:#2A323A; --metal:#8C969E; --floor:#DFE5EA;
+  --red:#D2302C; --blue:#2360C4; --yellow:#E2B01A; --green:#2B9551;
+  --acc:var(--red);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0F151B; --surface:#172029; --ink:#E7ECF0; --muted:#95A2AE; --line:#29343F; --ghost:#4D5A67; --soft:#1C2631;
+    --mus:#35424E; --bodyn:#222C36; --fig3d:#77838F; --plate:#0C1014; --metal:#6F7A84; --floor:#26313C;
+    --red:#EF4B45; --blue:#4C86EA; --yellow:#F2C53A; --green:#3FB56A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F151B; --surface:#172029; --ink:#E7ECF0; --muted:#95A2AE; --line:#29343F; --ghost:#4D5A67; --soft:#1C2631;
+  --mus:#35424E; --bodyn:#222C36; --fig3d:#77838F; --plate:#0C1014; --metal:#6F7A84; --floor:#26313C;
+  --red:#EF4B45; --blue:#4C86EA; --yellow:#F2C53A; --green:#3FB56A;
+}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:18px 110px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,9vw,52px);line-height:.95;letter-spacing:.01em;text-transform:uppercase;margin:0;text-wrap:balance}
+header h1 span{color:var(--acc)}
+.sub{color:var(--muted);margin:.4rem 0 0;font-size:14px;max-width:60ch}
+h2.sec{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:22px;letter-spacing:.03em;margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:16px}
+.panel .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:13px;margin:4px 0 0}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.wd{appearance:none;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px 2px 7px;text-align:center;font:500 11px var(--body);color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-width:0}
+.wd b{font-family:var(--display);font-size:15px;color:var(--ink);letter-spacing:.03em;text-transform:uppercase}
+.wd .dot{width:14px;height:14px;border-radius:50%;border:2px dashed var(--ghost)}
+.wd.on .dot{border:none}
+.wd.on{background:var(--surface)}
+.wd.today{outline:2px solid var(--ink);outline-offset:-2px}
+.wd span.s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.warnbox{margin-top:10px;font-size:13px;background:var(--soft);border-left:3px solid var(--yellow);padding:7px 10px;border-radius:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mapgrid{display:grid;grid-template-columns:minmax(150px,44%) 1fr;gap:14px;margin-top:10px;align-items:start}
+.mapgrid svg{width:100%;height:auto;display:block}
+.mlist{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.mrow{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mrow .n{font-weight:600}
+.mrow .v{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.mrow .x{grid-column:1/-1;color:var(--muted);font-size:11.5px;line-height:1.3}
+.mrow .bar{grid-column:1/-1;height:4px;border-radius:3px;background:var(--line);overflow:hidden}
+.mrow .bar i{display:block;height:100%;background:var(--red)}
+.lvl{font-size:11px;padding:1px 6px;border-radius:5px;margin-left:6px;font-weight:600;font-family:var(--body)}
+.lvl.lo{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.lvl.ok{background:var(--green);color:#fff}
+.lvl.hi{background:var(--yellow);color:#1a1a1a}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-top:16px}
+.tab{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:8px 4px;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.tab small{font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:0;text-transform:none;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tab[aria-selected="true"]{background:var(--c);border-color:var(--c);color:var(--cink)}
+.tab[aria-selected="true"] small{color:var(--cink);opacity:.85}
+.tab:focus-visible,.btn:focus-visible,.wd:focus-visible,.anim:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.dayhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:10px 0 10px;flex-wrap:wrap}
+.dayhead h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:30px;margin:0;line-height:1;letter-spacing:.02em}
+.dayhead p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.progress{font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:minmax(118px,38%) 1fr;overflow:hidden}
+.card.done{opacity:.62}
+.anim{appearance:none;border:none;border-right:1px solid var(--line);background:var(--soft);position:relative;display:flex;align-items:center;justify-content:center;min-height:150px;padding:0;cursor:pointer;color:inherit}
+.anim canvas{width:100%;aspect-ratio:1/1;max-width:100%;display:block}
+.anim .no{position:absolute;top:6px;left:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.anim .b3{position:absolute;right:6px;bottom:6px;font:700 11px var(--mono);background:var(--ink);color:var(--surface);padding:2px 6px;border-radius:5px}
+.info{padding:12px 13px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.info h3{margin:0;font-family:var(--display);font-weight:700;font-size:21px;line-height:1.05;letter-spacing:.01em;text-wrap:balance}
+.en{color:var(--muted);font-size:12px;margin-top:-4px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sets{font-family:var(--mono);font-weight:700;font-size:14px;background:var(--ink);color:var(--surface);padding:3px 8px;border-radius:6px;font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:999px;border:1.5px solid var(--acc);line-height:1.3}
+.chip.p{background:var(--acc);color:var(--accink)}
+.chip.s{color:var(--ink)}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 9px;font:500 13px var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:5px;text-decoration:none;line-height:1.2}
+.btn.rest{font-family:var(--mono);font-size:12px}
+.btn.yt{background:#E62117;border-color:#E62117;color:#fff;font-weight:600}
+.btn.yt.alt{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.chk[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.btn[aria-pressed="true"].seg{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+ul.tips{margin:0;padding-left:17px;font-size:13.5px}
+ul.tips li{margin:1px 0}
+.links{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.notes ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:65ch}
+.notes b{font-weight:600}
+.warn{color:var(--muted);font-size:12.5px;margin:12px 0 0}
+.timer{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--surface);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;z-index:40;box-shadow:0 -6px 24px rgba(0,0,0,.18)}
+.timer .t{font-family:var(--mono);font-weight:700;font-size:30px;font-variant-numeric:tabular-nums;min-width:4.2ch}
+.timer .lbl{flex:1;font-size:13px;opacity:.8;min-width:0}
+.timer .bar{position:absolute;left:0;top:0;height:4px;background:var(--acc);transition:width .25s linear}
+.timer button{appearance:none;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:6px 10px;font:600 13px var(--body);cursor:pointer}
+.timer.fin{background:var(--green);color:#fff}
+/* viewer */
+.viewer{position:fixed;inset:0;z-index:30;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+.vtop{display:flex;align-items:center;gap:10px;padding:10px 16px;position:sticky;top:0;background:var(--bg);z-index:2}
+.vtop h3{margin:0;font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em;line-height:1;flex:1;min-width:0}
+.vstage{position:relative;height:58vh;min-height:300px;max-height:620px;background:var(--soft);border-block:1px solid var(--line);touch-action:none;cursor:grab}
+.vstage canvas{width:100%;height:100%;display:block}
+.vstage .hintov{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+.vctl{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px}
+.vctl .grp{display:flex;gap:4px}
+.vbody{padding:4px 16px;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.legend{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+@media (max-width:430px){
+  .card{grid-template-columns:120px 1fr}
+  .info h3{font-size:19px}
+  .tab{font-size:14px}
+  .mapgrid{grid-template-columns:1fr}
+  .mapgrid svg{max-width:300px;margin:0 auto}
+}
+@media (prefers-reduced-motion:reduce){ .timer .bar{transition:none} }
+</style>
+
+<div class="wrap" lang="tr">
+  <header>
+    <h1>Üst / Alt <span>4 Gün</span></h1>
+    <p class="sub">Spor salonu · orta seviye · kas kazanımı. 3D animasyona dokun, döndürerek incele. Formdan emin değilsen videoyu aç.</p>
+  </header>
+
+  <section class="panel">
+    <div class="hd"><h2 class="sec">Haftan</h2><button class="btn" type="button" id="defsched">Varsayılan: Pzt Sal Per Cum</button></div>
+    <p class="hint">Güne dokun: Dinlen → Üst A → Alt A → Üst B → Alt B. Günleri istediğin gibi seç.</p>
+    <div class="week" id="week"></div>
+    <div id="schedwarn"></div>
+  </section>
+
+  <section class="panel">
+    <div class="hd"><h2 class="sec">Kas haritası</h2><span class="hint" style="margin:0">Haftalık set</span></div>
+    <p class="hint">Seçtiğin günlere göre her kasın haftalık set sayısı. Ana hareket 1 set, yardımcı kas 0,5 set sayılır. Kas gelişimi için genelde 10–20 set önerilir.</p>
+    <div class="mapgrid"><div id="weekmap"></div><div class="mlist" id="mlist"></div></div>
+  </section>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <section id="day"></section>
+
+  <section class="panel notes">
+    <h2 class="sec">Nasıl ilerlerim?</h2>
+    <ol>
+      <li><b>Çift ilerleme:</b> Bir harekette tüm setlerde aralığın üst ucuna ulaştığında (ör. 4 × 8) bir sonraki antrenmanda ağırlığı artır: üst vücutta +2,5 kg, alt vücutta +5 kg.</li>
+      <li><b>Yoğunluk:</b> Her sette 1–2 tekrar “yedekte” bırak (RIR 1–2). İzolasyon hareketlerinde son set tükenişe kadar gidebilir.</li>
+      <li><b>Isınma:</b> İlk ana harekette 2–3 hafif ısınma seti yap (boş bar → %50 → %75).</li>
+      <li><b>Dinlenme:</b> Ağır bileşik hareketlerde 2–3 dk, diğerlerinde 60–90 sn. Karttaki süre butonuna dokun, sayaç başlasın.</li>
+      <li><b>Günleri seçerken:</b> Aynı bölgeyi (iki alt ya da iki üst gün) art arda koymamaya çalış. Kasın toparlanması için 48 saat iyi bir ara.</li>
+      <li><b>Deload:</b> 6–8 haftada bir, bir hafta boyunca set sayısını yarıya indir.</li>
+      <li><b>Beslenme:</b> Günde vücut ağırlığının kilosu başına yaklaşık 1,6–2 g protein ve hafif kalori fazlası kas kazanımını destekler.</li>
+    </ol>
+    <p class="warn">Ağrı hissedersen hareketi bırak. Sağlık sorunun varsa programa başlamadan önce bir uzmana danış. Videolar için internet gerekir.</p>
+  </section>
+</div>
+
+<div class="viewer" id="viewer" hidden lang="tr" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div class="vtop"><button class="btn" type="button" id="vclose">← Geri</button><h3 id="vtitle"></h3></div>
+  <div class="vstage" id="vstage"><canvas id="vcanvas"></canvas><div class="hintov">Parmağınla sürükle, döndür</div></div>
+  <div class="vctl">
+    <div class="grp" id="vviews">
+      <button class="btn seg" type="button" data-yaw="0">Yan</button>
+      <button class="btn seg" type="button" data-yaw="38" aria-pressed="true">Çapraz</button>
+      <button class="btn seg" type="button" data-yaw="90">Ön</button>
+      <button class="btn seg" type="button" data-yaw="180">Arka</button>
+    </div>
+    <div class="grp" id="vspeed">
+      <button class="btn seg" type="button" data-sp="0.5">0,5×</button>
+      <button class="btn seg" type="button" data-sp="1" aria-pressed="true">1×</button>
+    </div>
+    <button class="btn" type="button" id="vpause">❚❚ Durdur</button>
+  </div>
+  <div class="vbody" id="vbody"></div>
+</div>
+
+<div class="timer" id="timer" hidden>
+  <div class="bar" id="tbar"></div>
+  <div class="t" id="tnum">0:00</div>
+  <div class="lbl" id="tlbl">Dinlenme</div>
+  <button type="button" id="tplus">+30 sn</button>
+  <button type="button" id="tstop">Kapat</button>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const MUS={chest:'Göğüs',fdelt:'Ön omuz',sdelt:'Yan omuz',rdelt:'Arka omuz',lats:'Kanat (lat)',traps:'Trapez / üst sırt',lowback:'Bel',biceps:'Pazu (biceps)',triceps:'Arka kol (triceps)',forearm:'Ön kol',abs:'Karın',quads:'Ön bacak',hams:'Arka bacak',glutes:'Kalça',calves:'Kalf'};
+const S0={H:[50,12],S:[50,22],P:[50,50],K:[51,70],A:[50,89],T:[57,90]};
+const L0={H:[50,20],S:[50,30],P:[50,56],K:[51,73],A:[50,89],T:[57,90]};
+const barTop=(x1,x2,y)=>({t:'line',a:[x1,y],b:[x2,y],w:3,zbar:true});
+const C=(t,p,extra)=>Object.assign({t,p},extra||{});
+
+const DAYS=[
+{key:'d1',name:'Üst A',focus:'Göğüs · Sırt · Omuz · Arka kol',color:'red',ex:[
+ {tr:'Bench Press',en:'Barbell Bench Press',m:'chest/fdelt triceps',sets:'4 × 6–8',rest:150,tips:['Kürek kemiklerini sıkıştır, ayaklar yere bassın','Bar göğüs altına insin, dirsekler ~45°'],
+  A:{H:[22,60],S:[31,63],P:[57,63],K:[70,58],A:[74,84],T:[80,86],E:[32,50],W:[32,37]},B:{E:[40,71],W:[35,57]},
+  eq:[{t:'line',a:[16,67],b:[64,67],w:5},{t:'line',a:[22,67],b:[22,91],w:3},{t:'line',a:[58,67],b:[58,91],w:3},C('plate','W')]},
+ {tr:'Barbell Row',en:'Bent-Over Barbell Row',m:'lats traps/rdelt biceps lowback',sets:'4 × 8',rest:120,tips:['Sırt düz, gövde ~45° öne eğik','Barı göbeğe doğru çek, dirsekler geriye'],
+  A:{H:[72,37],S:[64,43],P:[42,57],K:[55,72],A:[51,89],T:[58,90],E:[64,57],W:[64,70]},B:{E:[52,46],W:[58,58]},eq:[C('plate','W')]},
+ {tr:'Eğimli Dumbbell Press',en:'Incline Dumbbell Press',m:'chest fdelt/triceps',sets:'3 × 8–10',rest:90,tips:['Sehpa 30–45° açıda','Dambılları göğüs üstüne kontrollü indir'],
+  A:{H:[47,40],S:[44,50],P:[36,74],K:[55,72],A:[57,89],T:[63,90],E:[52,40],W:[56,28]},B:{E:[39,59],W:[48,49]},
+  eq:[{t:'line',a:[31,76],b:[39,48],w:5},{t:'line',a:[30,78],b:[52,78],w:5},{t:'line',a:[40,78],b:[40,91],w:3},C('db','W')]},
+ {tr:'Lat Pulldown',en:'Lat Pulldown',m:'lats/biceps rdelt',sets:'3 × 10',rest:90,grip:10,tips:['Barı üst göğse çek, göğsü kaldır','Gövdeyi sallayarak çekme'],
+  A:{H:[46,30],S:[46,40],P:[46,66],K:[62,66],A:[62,88],T:[68,89],E:[50,26],W:[52,12]},B:{E:[40,51],W:[52,40]},
+  eq:[{t:'line',a:[38,69],b:[56,69],w:5},{t:'line',a:[46,69],b:[46,91],w:3,zs:[0]},{t:'circle',c:[62,60],r:3},C('cable','W',{from:[52,-6]}),C('hbar','W')]},
+ {tr:'Yana Açış',en:'Dumbbell Lateral Raise',m:'sdelt/traps',sets:'3 × 12–15',rest:60,view:'front',tips:['Dirsekler hafif bükük, omuz hizasında dur','Yavaş indir, sallanma'],
+  A:{H:[50,13],S:[50,23],P:[50,50],SL:[43,25],SR:[57,25],E:[40,37],W:[39,49],E2:[60,37],W2:[61,49],PL:[45,50],PR:[55,50],K:[44,70],A:[44,89],K2:[56,70],A2:[56,89]},
+  B:{E:[32,25],W:[21,26],E2:[68,25],W2:[79,26]},eq:[C('db','W')]},
+ {tr:'Triceps Pushdown',en:'Cable Triceps Pushdown',m:'triceps/',sets:'3 × 12',rest:60,grip:5,tips:['Dirsekleri gövdeye sabitle','Altta kolu tamamen aç, 1 sn sık'],
+  A:{...S0,H:[49,12],S:[48,22],P:[47,50],E:[51,36],W:[61,28]},B:{W:[53,49]},eq:[C('cable','W',{from:[64,-6]}),C('hbar','W')]},
+]},
+{key:'d2',name:'Alt A',focus:'Ön bacak · Arka bacak · Kalf · Core',color:'blue',ex:[
+ {tr:'Back Squat',en:'Barbell Back Squat',m:'quads glutes/hams lowback abs',sets:'4 × 6–8',rest:180,grip:10,tips:['Göğüs dik, dizler ayak ucu yönünde','En az uyluk yere paralel olana kadar in'],
+  A:{...S0,E:[42,27],W:[46,21],X:[49,21]},B:{H:[56,31],S:[52,40],P:[36,64],K:[58,66],E:[44,45],W:[48,38],X:[51,39]},eq:[C('plate','X')]},
+ {tr:'Romanian Deadlift',en:'Romanian Deadlift',m:'hams glutes/lowback forearm',sets:'3 × 8–10',rest:120,tips:['Kalçayı geriye it, dizler hafif bükük','Bar bacağa yakın, sırt nötr'],
+  A:{...S0,E:[52,36],W:[53,49]},B:{H:[72,35],S:[64,40],P:[40,54],K:[53,70],E:[64,54],W:[64,67]},eq:[C('plate','W')]},
+ {tr:'Leg Press',en:'45 Degree Leg Press',m:'quads glutes/hams',sets:'3 × 10–12',rest:120,grip:6,tips:['Bel sırt yastığından kalkmasın','Dizleri üstte kilitleme'],
+  A:{H:[15,43],S:[20,52],P:[34,72],K:[47,56],A:[62,44],T:[66,40],E:[28,64],W:[35,70]},B:{K:[34,52],A:[54,52],T:[58,48]},
+  eq:[{t:'line',a:[13,46],b:[27,76],w:5},{t:'line',a:[27,78],b:[44,80],w:5},C('sled','A')]},
+ {tr:'Lying Leg Curl',en:'Lying Leg Curl',m:'hams/calves',sets:'3 × 12',rest:75,tips:['Kalça banktan kalkmasın','Yukarıda sık, yavaş indir'],
+  A:{H:[82,50],S:[72,55],P:[46,56],K:[28,56],A:[10,57],T:[8,51],E:[78,63],W:[84,64]},B:{A:[34,38],T:[40,35]},
+  eq:[{t:'line',a:[16,61],b:[88,61],w:5},{t:'line',a:[24,61],b:[24,91],w:3},{t:'line',a:[76,61],b:[76,91],w:3},C('pad','A')]},
+ {tr:'Ayakta Kalf',en:'Standing Calf Raise',m:'calves/',sets:'4 × 12–15',rest:60,grip:7,tips:['Parmak ucunda en yükseğe çık, 1 sn bekle','Topuğu tam aşağı indir, esnet'],
+  A:{...S0,E:[50,36],W:[50,50]},B:{H:[50,6],S:[50,16],P:[50,44],K:[51,64],A:[49,83],E:[50,30],W:[50,44]},eq:[C('db','W')]},
+ {tr:'Plank',en:'Forearm Plank',m:'abs/fdelt glutes',sets:'3 × 45 sn',rest:60,grip:4,tips:['Baş, kalça ve topuk düz bir çizgide','Karnı ve kalçayı sık, nefesi tutma'],
+  A:{H:[80,70],S:[71,74],P:[45,76],K:[29,80],A:[13,84],T:[10,90],E:[71,89],W:[82,89]},B:{P:[45,74],K:[29,79]}},
+]},
+{key:'d3',name:'Üst B',focus:'Omuz · Sırt · Göğüs · Kollar',color:'yellow',ex:[
+ {tr:'Overhead Press',en:'Standing Overhead Press',m:'fdelt sdelt/triceps traps abs',sets:'4 × 6–8',rest:150,tips:['Kalça ve karın sıkı, belden bükülme','Bar başın üstünde kilitlensin'],
+  A:{...L0,E:[58,38],W:[55,28]},B:{E:[53,17],W:[52,5]},eq:[C('plate','W')]},
+ {tr:'Barfiks',en:'Pull-Up',m:'lats/biceps rdelt forearm',sets:'4 × 6–10',rest:120,grip:10,tips:['Tam asılıdan başla, çene barı geçsin','Yapamıyorsan lastikli ya da asistli'],
+  A:{H:[53,22],S:[50,31],P:[50,58],K:[55,75],A:[47,84],T:[51,87],E:[51,19],W:[50,7]},B:{H:[55,6],S:[50,17],P:[50,44],K:[55,61],A:[47,70],T:[51,73],E:[40,23]},
+  eq:[barTop(30,72,6)]},
+ {tr:'Oturarak Kablo Row',en:'Seated Cable Row',m:'lats traps/rdelt biceps',sets:'3 × 10',rest:90,grip:3,tips:['Göğüs dik, kürekleri sıkıştırarak çek','Gövdeyle sallanma'],
+  A:{H:[46,37],S:[42,46],P:[34,72],K:[52,62],A:[68,72],T:[70,64],E:[53,53],W:[65,58]},B:{H:[34,34],S:[34,44],E:[24,54],W:[37,60]},
+  eq:[{t:'line',a:[22,75],b:[46,75],w:5},{t:'line',a:[72,58],b:[72,80],w:4,d:1.4,zs:[0]},C('cable','W',{from:[98,62]}),C('grip','W')]},
+ {tr:'Dips',en:'Parallel Bar Dips',m:'chest triceps/fdelt',sets:'3 × 8–12',rest:90,tips:['Hafif öne eğil, göğse yüklen','Omuzda ağrı varsa derinliği azalt'],
+  A:{H:[50,12],S:[50,22],P:[48,50],K:[53,67],A:[45,78],T:[48,82],E:[51,35],W:[52,48]},B:{H:[54,26],S:[52,36],P:[48,63],K:[54,78],A:[44,84],T:[47,88],E:[40,38]},
+  eq:[{t:'line',a:[36,49],b:[70,49],w:4,d:.2,zs:[-8,8]},{t:'line',a:[40,49],b:[40,91],w:3,zs:[-8,8]},{t:'line',a:[66,49],b:[66,91],w:3,zs:[-8,8]}]},
+ {tr:'Face Pull',en:'Cable Face Pull',m:'rdelt traps/sdelt',sets:'3 × 15',rest:60,grip:4,tips:['İpi yüze çek, elleri kulak yanına aç','Dirsekler omuz hizasında'],
+  A:{...S0,E:[60,28],W:[72,20]},B:{E:[40,18],W:[53,13]},eq:[C('cable','W',{from:[100,18]}),C('grip','W')]},
+ {tr:'Barbell Curl',en:'Barbell Biceps Curl',m:'biceps/forearm',sets:'3 × 10',rest:60,grip:7,tips:['Dirsekler sabit, gövde sallanmasın','Yavaş indir (2–3 sn)'],
+  A:{...S0,E:[50,36],W:[52,49]},B:{W:[60,28]},eq:[C('bar','W')]},
+ {tr:'Baş Üstü Triceps',en:'Overhead Dumbbell Triceps Extension',m:'triceps/',sets:'3 × 12',rest:60,grip:1.5,tips:['Dirsekler tavana baksın, açılmasın','Altta tam esnet'],
+  A:{...L0,E:[52,16],W:[44,27]},B:{W:[53,3]},eq:[C('db1','W')]},
+]},
+{key:'d4',name:'Alt B',focus:'Arka zincir · Kalça · Ön bacak · Karın',color:'green',ex:[
+ {tr:'Deadlift',en:'Conventional Deadlift',m:'glutes hams lowback/quads traps forearm lats',sets:'3 × 5',rest:180,tips:['Bar ayak ortasının üstünde, sırt nötr','Yeri it, kalça ve omuz birlikte kalksın'],
+  A:{H:[67,45],S:[60,51],P:[38,66],K:[55,72],A:[50,89],T:[57,90],E:[58,64],W:[57,77],X:[57,82]},B:{...S0,E:[51,37],W:[52,51],X:[52,51]},eq:[C('plate','X')]},
+ {tr:'Bulgarian Split Squat',en:'Bulgarian Split Squat',m:'quads glutes/hams',sets:'3 × 10 / bacak',rest:90,grip:7,tips:['Arka ayak bankta, ön ayak yeterince ileride','Gövde dik, ön dize yüklen'],
+  A:{H:[48,12],S:[47,22],P:[46,50],K:[58,69],A:[62,89],T:[69,90],K2:[40,70],A2:[23,64],T2:[19,61],E:[46,36],W:[46,49],E2:[48,36],W2:[48,49]},
+  B:{H:[45,26],S:[44,36],P:[42,64],K:[62,66],K2:[36,84],A2:[24,65],T2:[20,62],E:[43,50],W:[43,63],E2:[45,50],W2:[45,63]},
+  eq:[{t:'line',a:[8,67],b:[30,67],w:5},{t:'line',a:[18,67],b:[18,91],w:3},C('db','W')]},
+ {tr:'Leg Extension',en:'Leg Extension',m:'quads/',sets:'3 × 12–15',rest:60,grip:9,tips:['Üstte 1 sn sık','Kontrollü indir, ağırlığı çarptırma'],
+  A:{H:[38,26],S:[38,36],P:[40,62],K:[58,62],A:[60,82],T:[66,84],E:[42,50],W:[48,62]},B:{A:[78,60],T:[79,54]},
+  eq:[{t:'line',a:[30,65],b:[58,65],w:5},{t:'line',a:[31,65],b:[31,30],w:5},{t:'line',a:[44,65],b:[44,91],w:3,zs:[0]},C('pad','A')]},
+ {tr:'Hip Thrust',en:'Barbell Hip Thrust',m:'glutes/hams',sets:'3 × 10',rest:90,tips:['Sırtın üstü bankta, çene hafif içeride','Üstte kalçayı sık, beli bükme'],
+  A:{H:[15,56],S:[22,60],P:[40,82],K:[58,68],A:[64,88],T:[70,89],E:[34,72],W:[40,76],X:[40,76]},B:{P:[48,62],K:[66,66],E:[40,58],W:[47,57],X:[47,57]},
+  eq:[{t:'line',a:[4,63],b:[26,63],w:5},{t:'line',a:[8,63],b:[8,91],w:3},{t:'line',a:[22,63],b:[22,91],w:3},C('plate','X')]},
+ {tr:'Oturarak Kalf',en:'Seated Calf Raise',m:'calves/',sets:'3 × 15',rest:60,grip:6,tips:['Topuğu tam indir, en üstte bekle','Yavaş ve tam hareket açıklığı'],
+  A:{H:[34,28],S:[34,38],P:[36,64],K:[56,64],A:[56,84],T:[64,82],E:[42,52],W:[50,61]},B:{K:[56,60],A:[56,79],T:[64,82]},
+  eq:[{t:'line',a:[26,67],b:[46,67],w:5},{t:'line',a:[36,67],b:[36,91],w:3,zs:[0]},{t:'line',a:[59,86],b:[71,86],w:6},C('pad','K',{dy:-4})]},
+ {tr:'Asılı Bacak Kaldırma',en:'Hanging Leg Raise',m:'abs/forearm',sets:'3 × 10–12',rest:60,grip:9,tips:['Sallanmadan, karınla kaldır','Yapamıyorsan diz çekerek başla'],
+  A:{H:[53,16],S:[50,25],P:[50,53],K:[50,72],A:[50,88],T:[55,89],E:[51,15],W:[50,6]},B:{K:[69,52],A:[88,51],T:[90,46]},eq:[barTop(30,72,6)]},
+]}];
+
+const WD=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+const DEF_SCHED=[0,1,null,2,3,null,null];
+DAYS.forEach((d,di)=>d.ex.forEach(e=>{
+  const [p,s]=e.m.split('/');e.mp=p.split(' ').filter(Boolean);e.ms=(s||'').split(' ').filter(Boolean);
+  e.n=parseInt(e.sets,10)||3;e.day=di;
+  const pts=[...Object.values(e.A),...Object.values(e.B)];
+  const xs=pts.map(q=>q[0]),ys=pts.map(q=>q[1]);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(91,...ys);
+  e.fr={cx:(x0+x1)/2,cy:(y0+y1)/2,s:Math.max(x1-x0,y1-y0,60)};
+}));
+
+/* ================= STORAGE ================= */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let sched=store.get('sched',DEF_SCHED);
+if(!Array.isArray(sched)||sched.length!==7)sched=DEF_SCHED.slice();
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const todayIdx=(new Date().getDay()+6)%7;
+let current=store.get('tab',null);
+if(current==null)current=sched[todayIdx]==null?0:sched[todayIdx];
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+const inkOn=c=>c==='yellow'?'#1a1a1a':'#fff';
+function yt(q){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(q)}
+function fmtRest(s){return s>=120?(s%60?`${Math.floor(s/60)},5 dk`:`${s/60} dk`):`${s} sn`}
+const fmtN=n=>String(Math.round(n*10)/10).replace('.',',');
+
+/* ================= BODY MAP (SVG) ================= */
+const SIL=(o)=>`<circle cx="${50+o}" cy="15" r="9"/><rect x="${45+o}" y="22" width="10" height="9"/><rect x="${33+o}" y="30" width="34" height="62" rx="9"/>
+<rect x="${18+o}" y="36" width="12" height="34" rx="6"/><rect x="${70+o}" y="36" width="12" height="34" rx="6"/>
+<rect x="${14+o}" y="66" width="11" height="32" rx="5"/><rect x="${75+o}" y="66" width="11" height="32" rx="5"/>
+<circle cx="${19+o}" cy="103" r="5"/><circle cx="${81+o}" cy="103" r="5"/><rect x="${35+o}" y="86" width="30" height="16" rx="6"/>
+<rect x="${34+o}" y="98" width="15" height="42" rx="7"/><rect x="${51+o}" y="98" width="15" height="42" rx="7"/>
+<rect x="${36+o}" y="140" width="12" height="38" rx="6"/><rect x="${52+o}" y="140" width="12" height="38" rx="6"/>
+<ellipse cx="${42+o}" cy="182" rx="7" ry="3.5"/><ellipse cx="${58+o}" cy="182" rx="7" ry="3.5"/>`;
+const E=(k,cx,cy,rx,ry)=>[k,`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"`];
+const R=(k,x,y,w,h,r)=>[k,`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}"`];
+const Pth=(k,d)=>[k,`<path d="${d}"`];
+const MSH=[
+ E('fdelt',30,39,6.5,6.5),E('fdelt',70,39,6.5,6.5),E('sdelt',23,42,3.5,6),E('sdelt',77,42,3.5,6),
+ R('chest',35.5,36,13.5,17,5),R('chest',51,36,13.5,17,5),R('abs',41,56,18,30,4),
+ E('biceps',24,55,4.8,10),E('biceps',76,55,4.8,10),E('forearm',19.5,80,4.3,11),E('forearm',80.5,80,4.3,11),
+ E('quads',41.5,118,6.5,18),E('quads',58.5,118,6.5,18),E('calves',42,158,4.5,13),E('calves',58,158,4.5,13),
+ Pth('traps','M140,30 L160,30 L166,38 L150,60 L134,38 Z'),
+ E('rdelt',130,39,6.5,6.5),E('rdelt',170,39,6.5,6.5),E('sdelt',123,42,3.5,6),E('sdelt',177,42,3.5,6),
+ Pth('lats','M135,44 L148,60 L147,82 L139,76 L135,60 Z'),Pth('lats','M165,44 L152,60 L153,82 L161,76 L165,60 Z'),
+ R('lowback',142,78,16,12,3),E('triceps',124,55,4.8,10),E('triceps',176,55,4.8,10),
+ E('forearm',119.5,80,4.3,11),E('forearm',180.5,80,4.3,11),
+ E('glutes',142.5,96,7.5,7.5),E('glutes',157.5,96,7.5,7.5),E('hams',141.5,122,6.5,16),E('hams',158.5,122,6.5,16),
+ E('calves',142,156,5.5,13),E('calves',158,156,5.5,13)];
+function bodySVG(fill,label){
+  return `<svg viewBox="0 0 200 204" role="img" aria-label="${label}"><g fill="var(--bodyn)">${SIL(0)}${SIL(100)}</g>
+  ${MSH.map(([k,s])=>{const [f,o]=fill(k);return `${s} fill="${f}" fill-opacity="${o}"><title>${MUS[k]}</title></${s.startsWith('<path')?'path':s.startsWith('<rect')?'rect':'ellipse'}>`}).join('')}
+  <text x="50" y="200" text-anchor="middle" font-size="9" font-family="var(--mono)" fill="var(--muted)">ÖN</text>
+  <text x="150" y="200" text-anchor="middle" font-size="9" font-family="var(--mono)" fill="var(--muted)">ARKA</text></svg>`;
+}
+function exMap(e){return bodySVG(k=>e.mp.includes(k)?['var(--acc)',1]:e.ms.includes(k)?['var(--acc)',.42]:['var(--mus)',1],e.tr+' çalışan kaslar')}
+
+/* ================= WEEK / SCHEDULE ================= */
+function weeklyVolume(){
+  const v={},by={};Object.keys(MUS).forEach(k=>{v[k]=0;by[k]=new Set()});
+  sched.forEach(si=>{if(si==null)return;DAYS[si].ex.forEach(e=>{
+    e.mp.forEach(k=>{v[k]+=e.n;by[k].add(e.tr)});e.ms.forEach(k=>{v[k]+=e.n*.5;by[k].add(e.tr)});
+  })});
+  return {v,by};
+}
+function renderWeek(){
+  $('#week').innerHTML=WD.map((n,k)=>{const si=sched[k];const d=si==null?null:DAYS[si];
+    return `<button type="button" class="wd ${d?'on':''} ${k===todayIdx?'today':''}" data-k="${k}" aria-label="${n}: ${d?d.name:'Dinlenme'}. Değiştirmek için dokun">
+      <b>${n}</b><span class="dot" style="${d?`background:var(--${d.color})`:''}"></span><span class="s">${d?d.name:'Dinlen'}</span></button>`}).join('');
+  $('#week').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k;const cur=sched[k];sched[k]=cur==null?0:(cur<3?cur+1:null);
+    store.set('sched',sched);renderAllSched();
+  });
+  // warnings
+  const W=[];const type=si=>si==null?null:(si%2===0?'üst':'alt');
+  for(let k=0;k<7;k++){const a=sched[k],b=sched[(k+1)%7];if(a!=null&&b!=null&&type(a)===type(b))W.push(`${WD[k]} ve ${WD[(k+1)%7]} ikisi de ${type(a)} vücut. Arada bir gün bırakmak toparlanmayı kolaylaştırır.`)}
+  const cnt=sched.filter(x=>x!=null).length;
+  const missing=DAYS.filter((d,i)=>!sched.includes(i)).map(d=>d.name);
+  if(missing.length&&cnt)W.push(`Programda olmayan gün: ${missing.join(', ')}.`);
+  if(!cnt)W.push('Hiç antrenman günü seçmedin. Bir güne dokunarak başla.');
+  $('#schedwarn').innerHTML=W.slice(0,3).map(w=>`<div class="warnbox">${w}</div>`).join('');
+}
+function renderWeekMap(){
+  const {v,by}=weeklyVolume();
+  $('#weekmap').innerHTML=bodySVG(k=>v[k]>0?['var(--red)',Math.min(1,.22+v[k]/18*.78)]:['var(--mus)',1],'Haftalık kas hacmi haritası');
+  const rows=Object.keys(MUS).sort((a,b)=>v[b]-v[a]);
+  $('#mlist').innerHTML=rows.map(k=>{const n=v[k];const l=n<0.5?'':n<10?'<span class="lvl lo">az</span>':n<=20?'<span class="lvl ok">iyi</span>':'<span class="lvl hi">yüksek</span>';
+    return `<div class="mrow"><span class="n">${MUS[k]}${l}</span><span class="v">${fmtN(n)} set</span>
+    <span class="bar"><i style="width:${Math.min(100,n/22*100)}%"></i></span>${by[k].size?`<span class="x">${[...by[k]].join(', ')}</span>`:''}</div>`}).join('');
+}
+function renderAllSched(){renderWeek();renderWeekMap();renderTabs()}
+$('#defsched').onclick=()=>{sched=DEF_SCHED.slice();store.set('sched',sched);renderAllSched()};
+
+/* ================= TABS / DAY ================= */
+function renderTabs(){
+  $('#tabs').innerHTML=DAYS.map((d,i)=>{const days=WD.filter((n,k)=>sched[k]===i);
+    return `<button class="tab" role="tab" id="tab${i}" aria-selected="${i===current}" style="--c:var(--${d.color});--cink:${inkOn(d.color)}">${d.name}<small>${days.length?days.join(' · '):'Atanmadı'}</small></button>`}).join('');
+  DAYS.forEach((d,i)=>$('#tab'+i).onclick=()=>select(i));
+}
+function applyDayColor(d){const r=document.documentElement.style;r.setProperty('--acc',`var(--${d.color})`);r.setProperty('--accink',inkOn(d.color))}
+function renderDay(){
+  const d=DAYS[current];applyDayColor(d);
+  const done=store.get('done_'+d.key,[]);
+  const days=WD.filter((n,k)=>sched[k]===current);
+  $('#day').innerHTML=`
+    <div class="dayhead"><div><h2>${d.name}</h2><p>${days.length?days.join(', ')+' · ':''}${d.focus} · ${d.ex.length} hareket</p></div>
+    <div class="progress"><span id="prog">${done.length}/${d.ex.length} tamam</span><button class="btn" type="button" id="reset">Sıfırla</button></div></div>
+    <div class="list">${d.ex.map((e,i)=>`
+      <article class="card ${done.includes(i)?'done':''}" id="c${i}">
+        <button class="anim" type="button" data-open="${i}" aria-label="${e.tr} 3D görünümünü aç"><span class="no">${i+1}</span><canvas data-i="${i}"></canvas><span class="b3">3D ↻</span></button>
+        <div class="info">
+          <h3>${e.tr}</h3><div class="en">${e.en}</div>
+          <div class="chips">${e.mp.map(k=>`<span class="chip p">${MUS[k]}</span>`).join('')}${e.ms.map(k=>`<span class="chip s">${MUS[k]}</span>`).join('')}</div>
+          <div class="meta"><span class="sets">${e.sets}</span>
+            <button class="btn rest" type="button" data-rest="${e.rest}" data-name="${e.tr}">⏱ ${fmtRest(e.rest)}</button>
+            <button class="btn chk" type="button" data-chk="${i}" aria-pressed="${done.includes(i)}">${done.includes(i)?'✓ Yapıldı':'Yapıldı'}</button></div>
+          <ul class="tips">${e.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+          <div class="links">
+            <a class="btn yt" href="${yt(e.en+' proper form tutorial')}" target="_blank" rel="noopener">▶ Video izle</a>
+            <a class="btn yt alt" href="${yt(e.tr+' nasıl yapılır doğru form')}" target="_blank" rel="noopener">▶ Türkçe anlatım</a>
+          </div>
+        </div>
+      </article>`).join('')}</div>`;
+  $('#day').querySelectorAll('[data-rest]').forEach(b=>b.onclick=()=>startTimer(+b.dataset.rest,b.dataset.name));
+  $('#day').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openViewer(+b.dataset.open));
+  $('#day').querySelectorAll('[data-chk]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.chk;let arr=store.get('done_'+d.key,[]);
+    arr=arr.includes(i)?arr.filter(x=>x!==i):[...arr,i];store.set('done_'+d.key,arr);
+    const on=arr.includes(i);b.setAttribute('aria-pressed',on);b.textContent=on?'✓ Yapıldı':'Yapıldı';
+    $('#c'+i).classList.toggle('done',on);$('#prog').textContent=`${arr.length}/${d.ex.length} tamam`;
+  });
+  $('#reset').onclick=()=>{store.set('done_'+d.key,[]);renderDay()};
+  setupCanvases();
+}
+function select(i){current=i;store.set('tab',i);renderTabs();renderDay();const t=$('#tabs');window.scrollTo({top:t.offsetTop-4})}
+
+/* ================= COLORS ================= */
+let colCache={key:''};
+function readColors(){
+  const d=DAYS[current];
+  const raw={ink:cssVar('--ink'),ghost:cssVar('--ghost'),muted:cssVar('--muted'),line:cssVar('--line'),soft:cssVar('--soft'),
+    acc:cssVar('--'+d.color),fig:cssVar('--fig3d'),plate:cssVar('--plate'),metal:cssVar('--metal'),floor:cssVar('--floor')};
+  const key=Object.values(raw).join();
+  if(key===colCache.key)return colCache;
+  colCache={key,...raw};
+  if(window.THREE){for(const k in raw)colCache['c_'+k]=new THREE.Color(raw[k]);colCache.c_sec=colCache.c_fig.clone().lerp(colCache.c_acc,.5)}
+  return colCache;
+}
+
+/* ================= 2D FALLBACK ================= */
+const SIDE=[['S','P'],['P','K'],['K','A'],['A','T'],['S','E'],['E','W'],['S','H']];
+const SIDE_BACK=[['P','K2'],['K2','A2'],['A2','T2'],['S','E2'],['E2','W2']];
+const FRONT=[['S','H'],['S','P'],['SL','SR'],['SL','E'],['E','W'],['SR','E2'],['E2','W2'],['PL','PR'],['PL','K'],['K','A'],['PR','K2'],['K2','A2']];
+function lerp2(a,b,p){return[a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p]}
+function interp(e,p){const B=Object.assign({},e.A,e.B),pt={};for(const k in e.A)pt[k]=lerp2(e.A[k],B[k]||e.A[k],p);return pt}
+function draw2D(ctx,e,p,col){
+  const s=ctx.canvas.width/112;ctx.setTransform(s,0,0,s,6*s,6*s);ctx.clearRect(-6,-6,112,112);
+  const pt=interp(e,p);ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle=col.line;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-4,91.5);ctx.lineTo(104,91.5);ctx.stroke();
+  (e.eq||[]).forEach(q=>{ctx.strokeStyle=col.ghost;ctx.fillStyle=col.ghost;
+    if(q.t==='line'){ctx.lineWidth=q.w||3;ctx.beginPath();ctx.moveTo(...q.a);ctx.lineTo(...q.b);ctx.stroke()}
+    if(q.t==='circle'){ctx.beginPath();ctx.arc(q.c[0],q.c[1],q.r,0,7);ctx.fill()}
+    if(q.t==='cable'){ctx.lineWidth=1;ctx.strokeStyle=col.muted;ctx.beginPath();ctx.moveTo(...q.from);ctx.lineTo(...pt[q.p]);ctx.stroke()}});
+  const seg=(l,c,w)=>{ctx.strokeStyle=c;ctx.lineWidth=w;l.forEach(([a,b])=>{if(pt[a]&&pt[b]){ctx.beginPath();ctx.moveTo(...pt[a]);ctx.lineTo(...pt[b]);ctx.stroke()}})};
+  if(e.view==='front')seg(FRONT,col.ink,3.6);else{seg(SIDE_BACK,col.ghost,3.6);seg(SIDE,col.ink,3.8)}
+  ctx.fillStyle=col.ink;ctx.beginPath();ctx.arc(pt.H[0],pt.H[1],5.6,0,7);ctx.fill();
+  (e.eq||[]).forEach(q=>{const c=pt[q.p];if(!c)return;const x=c[0],y=c[1]+(q.dy||0);ctx.fillStyle=col.acc;ctx.strokeStyle=col.acc;
+    if(q.t==='plate'){ctx.beginPath();ctx.arc(x,y,8,0,7);ctx.fill()}
+    if(q.t==='bar'){ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill()}
+    if(q.t==='db'||q.t==='db1'){ctx.fillRect(x-6,y-3,12,6)}
+    if(q.t==='hbar'){ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(x-7,y);ctx.lineTo(x+7,y);ctx.stroke()}
+    if(q.t==='grip'||q.t==='pad'){ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill()}
+    if(q.t==='sled'){ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x-5,y-3);ctx.lineTo(x+6,y+8);ctx.stroke()}});
+}
+
+/* ================= 3D ENGINE ================= */
+let G=null; // {thumb, scene, man, parts, ...}
+const PART={chest:'upperT',lats:'upperT',traps:'upperT',abs:'lowerT',lowback:'lowerT',fdelt:'delt',sdelt:'delt',rdelt:'delt',biceps:'uarm',triceps:'uarm',forearm:'farm',quads:'thigh',hams:'thigh',glutes:'glute',calves:'shin'};
+function init3D(){
+  if(!window.THREE)return null;
+  try{
+    const thumb=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+    if(!thumb.getContext())return null;
+    thumb.setPixelRatio(1);thumb.setSize(360,360,false);thumb.setClearColor(0x000000,0);
+    thumb.shadowMap.enabled=true;thumb.shadowMap.type=THREE.PCFSoftShadowMap;
+    const V=THREE.Vector3;
+    const scene=new THREE.Scene();
+    scene.add(new THREE.HemisphereLight(0xffffff,0x707a84,.75));
+    const dir=new THREE.DirectionalLight(0xffffff,.8);dir.castShadow=true;dir.shadow.mapSize.set(1024,1024);
+    Object.assign(dir.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:1,far:40});dir.shadow.bias=-0.002;
+    scene.add(dir);scene.add(dir.target);
+    const fill=new THREE.DirectionalLight(0xffffff,.25);fill.position.set(-6,4,-5);scene.add(fill);
+    const floorMat=new THREE.MeshBasicMaterial({color:0xdddddd});
+    const floor=new THREE.Mesh(new THREE.CircleGeometry(6.2,64),floorMat);floor.rotation.x=-Math.PI/2;floor.position.y=-0.02;scene.add(floor);
+    const shadow=new THREE.Mesh(new THREE.CircleGeometry(6.2,64),new THREE.ShadowMaterial({opacity:.28}));shadow.rotation.x=-Math.PI/2;shadow.receiveShadow=true;scene.add(shadow);
+    const man=new THREE.Group();scene.add(man);const parts=[];
+    const mk=(geo,key)=>{const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x999999,roughness:.6,metalness:.05}));m.castShadow=true;m.userData.key=key||null;man.add(m);parts.push(m);return m};
+    const cyl=(a,b)=>new THREE.CylinderGeometry(a,b,1,18);
+    const sph=r=>new THREE.SphereGeometry(r,20,14);
+    const P={
+      head:mk(sph(.58)),neck:mk(cyl(.2,.24)),
+      upperT:mk(cyl(1,.8),'upperT'),cap:mk(sph(1),'upperT'),lowerT:mk(cyl(.8,.9),'lowerT'),pelvis:mk(sph(1)),
+      deltL:mk(sph(.4),'delt'),deltR:mk(sph(.4),'delt'),gluteL:mk(sph(.44),'glute'),gluteR:mk(sph(.44),'glute')};
+    ['L','R'].forEach(s=>{
+      P['uarm'+s]=mk(cyl(.2,.17),'uarm');P['elb'+s]=mk(sph(.17),'farm');P['farm'+s]=mk(cyl(.17,.13),'farm');P['hand'+s]=mk(sph(.17));
+      P['thigh'+s]=mk(cyl(.33,.22),'thigh');P['knee'+s]=mk(sph(.22));P['shin'+s]=mk(cyl(.23,.15),'shin');P['ank'+s]=mk(sph(.15));P['foot'+s]=mk(cyl(.14,.11));
+    });
+    const cam=new THREE.PerspectiveCamera(35,1,.1,200);
+    G={thumb,scene,dir,floor,floorMat,shadow,man,parts,P,cam,V,eqCache:new Map(),viewer:null};
+    return G;
+  }catch(err){return null}
+}
+const UP=()=>new THREE.Vector3(0,1,0);
+function placeLimb(m,a,b){const d=new THREE.Vector3().subVectors(b,a);const len=d.length()||0.001;m.position.copy(a).addScaledVector(d,.5);m.quaternion.setFromUnitVectors(UP(),d.divideScalar(len));m.scale.set(1,len,1)}
+function torsoQuat(a,b){const y=new THREE.Vector3().subVectors(b,a).normalize();let z=new THREE.Vector3(0,0,1);const x=new THREE.Vector3().crossVectors(y,z).normalize();z=new THREE.Vector3().crossVectors(x,y).normalize();return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x,y,z))}
+function placeTorso(m,a,b,sx,sz){const len=a.distanceTo(b);m.quaternion.copy(torsoQuat(a,b));m.position.copy(a).lerp(b,.5);m.scale.set(sx,len,sz)}
+function joints(e,pt){
+  const V=THREE.Vector3,J={};
+  if(e.view==='front'){
+    const f=k=>new V(0,(91-pt[k][1])/10,(pt[k][0]-50)/10);
+    Object.assign(J,{head:f('H'),neck:f('S'),pelvis:f('P'),shL:f('SL'),shR:f('SR'),elL:f('E'),wrL:f('W'),elR:f('E2'),wrR:f('W2'),hipL:f('PL'),hipR:f('PR'),knL:f('K'),anL:f('A'),knR:f('K2'),anR:f('A2')});
+    J.anL.y+=.1;J.anR.y+=.1;J.toL=J.anL.clone().add(new V(.7,-.08,0));J.toR=J.anR.clone().add(new V(.7,-.08,0));
+  }else{
+    const v=(k,z)=>new V((pt[k][0]-50)/10,(91-pt[k][1])/10,z/10);const wz=e.grip||8;
+    Object.assign(J,{head:v('H',0),neck:v('S',0),pelvis:v('P',0),shL:v('S',-6),shR:v('S',6),
+      elL:v('E',-Math.min(7.5,wz+2)),elR:pt.E2?v('E2',Math.min(7.5,wz+2)):v('E',Math.min(7.5,wz+2)),wrL:v('W',-wz),wrR:pt.W2?v('W2',wz):v('W',wz),
+      hipL:v('P',-4),hipR:v('P',4),knL:v('K',-4.5),knR:pt.K2?v('K2',4.5):v('K',4.5),anL:v('A',-4.5),anR:pt.A2?v('A2',4.5):v('A',4.5),toL:v('T',-4.5),toR:pt.T2?v('T2',4.5):v('T',4.5)});
+  }
+  return J;
+}
+function poseMan(J){
+  const P=G.P;const mid=J.pelvis.clone().lerp(J.neck,.45);
+  placeTorso(P.upperT,mid,J.neck,.5,.75);placeTorso(P.lowerT,J.pelvis,mid,.5,.75);
+  P.cap.position.copy(J.neck);P.cap.quaternion.copy(P.upperT.quaternion);P.cap.scale.set(.5,.2,.75);
+  P.pelvis.position.copy(J.pelvis);P.pelvis.quaternion.copy(P.lowerT.quaternion);P.pelvis.scale.set(.46,.36,.7);
+  placeLimb(P.neck,J.neck,J.neck.clone().lerp(J.head,.6));P.head.position.copy(J.head);
+  P.deltL.position.copy(J.shL);P.deltR.position.copy(J.shR);P.gluteL.position.copy(J.hipL);P.gluteR.position.copy(J.hipR);
+  ['L','R'].forEach(s=>{
+    placeLimb(P['uarm'+s],J['sh'+s],J['el'+s]);P['elb'+s].position.copy(J['el'+s]);placeLimb(P['farm'+s],J['el'+s],J['wr'+s]);P['hand'+s].position.copy(J['wr'+s]);
+    placeLimb(P['thigh'+s],J['hip'+s],J['kn'+s]);P['knee'+s].position.copy(J['kn'+s]);placeLimb(P['shin'+s],J['kn'+s],J['an'+s]);P['ank'+s].position.copy(J['an'+s]);placeLimb(P['foot'+s],J['an'+s],J['to'+s]);
+  });
+}
+function mat(c,rough){return new THREE.MeshStandardMaterial({color:c,roughness:rough??.5,metalness:.1})}
+function buildEq(e){
+  const V=THREE.Vector3,g=new THREE.Group(),dyn=[],mats={plate:mat(0x222222,.7),metal:mat(0x888888,.3),bench:mat(0xaaaaaa,.8),acc:mat(0xcc3333,.5)};
+  const to3=(q,z)=>new V((q[0]-50)/10,(91-q[1])/10,(z||0)/10);
+  const zCyl=(r,len,m)=>{const geo=new THREE.CylinderGeometry(r,r,len,20);geo.rotateX(Math.PI/2);return new THREE.Mesh(geo,m)};
+  const shadowAll=o=>o.traverse(c=>{if(c.isMesh){c.castShadow=true;c.receiveShadow=true}});
+  (e.eq||[]).forEach(q=>{
+    if(q.t==='line'){
+      if(q.zbar){const m=zCyl(.07,3.4,mats.metal);m.position.copy(to3([(q.a[0]+q.b[0])/2,q.a[1]]));g.add(m);return}
+      const w=q.w||3,d=q.d??(w>=5?1.5:.22),zs=q.zs??(w>=5?[0]:[-5,5]);
+      const a=to3(q.a),b=to3(q.b),len=a.distanceTo(b),ang=Math.atan2(b.y-a.y,b.x-a.x);
+      zs.forEach(z=>{const m=new THREE.Mesh(new THREE.BoxGeometry(len+(w>=5?.1:0),w/10*(w>=5?.9:1),d),w>=5?mats.bench:mats.metal);
+        m.position.copy(a).lerp(b,.5);m.position.z=z/10;m.rotation.z=ang;g.add(m)});return;
+    }
+    if(q.t==='circle'){const m=zCyl(q.r/10,1.4,mats.bench);m.position.copy(to3(q.c));g.add(m);return}
+    let obj=null,upd=null;
+    if(q.t==='plate'||q.t==='bar'){
+      const big=q.t==='plate';obj=new THREE.Group();const L=big?7:2.8;obj.add(zCyl(.06,L,mats.metal));
+      const offs=big?[2.35,2.68]:[1.05];const r=big?.8:.42;
+      offs.forEach(o=>[-1,1].forEach(sg=>{const pl=zCyl(r,big?.3:.18,mats.plate);pl.position.z=sg*o;obj.add(pl);const hub=zCyl(r*.35,big?.32:.2,mats.acc);hub.position.z=sg*o;obj.add(hub)}));
+      upd=(pt,J)=>{obj.position.copy(to3(pt[q.p]))};
+    }
+    if(q.t==='db'||q.t==='db1'){
+      const mkDb=()=>{const d=new THREE.Group();d.add(zCyl(.06,.9,mats.metal));[-1,1].forEach(s=>{const h=zCyl(.26,.26,mats.plate);h.position.z=s*.42;d.add(h)});return d};
+      if(q.t==='db1'){obj=mkDb();obj.rotation.x=Math.PI/2;upd=(pt,J)=>{obj.position.copy(J.wrL).lerp(J.wrR,.5);obj.position.y+=.25}}
+      else{obj=new THREE.Group();const d1=mkDb(),d2=mkDb();obj.add(d1,d2);if(e.view==='front'){d1.rotation.y=d2.rotation.y=Math.PI/2}
+        upd=(pt,J)=>{d1.position.copy(J.wrL);d2.position.copy(J.wrR)}}
+    }
+    if(q.t==='hbar'){obj=zCyl(.06,e.grip>6?2.4:1.3,mats.metal);upd=pt=>obj.position.copy(to3(pt[q.p]))}
+    if(q.t==='grip'){obj=zCyl(.1,.9,mats.acc);upd=pt=>obj.position.copy(to3(pt[q.p]))}
+    if(q.t==='pad'){obj=zCyl(.3,1.3,mats.bench);upd=pt=>{const c=to3(pt[q.p]);c.y-=(q.dy||0)/10;obj.position.copy(c)}}
+    if(q.t==='sled'){obj=new THREE.Mesh(new THREE.BoxGeometry(.18,1.7,2),mats.bench);obj.rotation.z=Math.PI/4;upd=pt=>{const c=to3(pt[q.p]);obj.position.set(c.x+.25,c.y+.25,0)}}
+    if(q.t==='cable'){
+      const geo=new THREE.BufferGeometry().setFromPoints([to3(q.from),to3(q.from)]);obj=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x777777}));
+      const A=to3(q.from);upd=pt=>{const B=to3(pt[q.p]);const a=geo.attributes.position;a.setXYZ(0,A.x,A.y,A.z);a.setXYZ(1,B.x,B.y,B.z);a.needsUpdate=true;geo.computeBoundingSphere()};
+      mats.cable=obj.material;
+    }
+    if(obj){g.add(obj);dyn.push(upd)}
+  });
+  shadowAll(g);
+  return {g,dyn,mats};
+}
+function eqFor(e){let x=G.eqCache.get(e);if(!x){x=buildEq(e);G.eqCache.set(e,x);G.scene.add(x.g)}return x}
+let activeEq=null;
+function setScene(e,p,col){
+  const pt=interp(e,p);const J=joints(e,pt);poseMan(J);
+  const eq=eqFor(e);if(activeEq&&activeEq!==eq)activeEq.g.visible=false;eq.g.visible=true;activeEq=eq;
+  eq.dyn.forEach(f=>f(pt,J));
+  eq.mats.plate.color.copy(col.c_plate);eq.mats.metal.color.copy(col.c_metal);eq.mats.bench.color.copy(col.c_ghost);eq.mats.acc.color.copy(col.c_acc);if(eq.mats.cable)eq.mats.cable.color.copy(col.c_muted);
+  const pk=new Set(e.mp.map(k=>PART[k])),sk=new Set(e.ms.map(k=>PART[k]));
+  G.parts.forEach(m=>{const k=m.userData.key;m.material.color.copy(k&&pk.has(k)?col.c_acc:k&&sk.has(k)?col.c_sec:col.c_fig)});
+  G.floorMat.color.copy(col.c_floor);
+  const tx=(e.fr.cx-50)/10,ty=(91-e.fr.cy)/10;
+  G.floor.position.x=G.shadow.position.x=tx;
+  G.dir.position.set(tx+4,12,7);G.dir.target.position.set(tx,0,0);
+  return new THREE.Vector3(tx,ty,0);
+}
+function aimCam(cam,target,e,yawDeg,pitchDeg,zoom){
+  const d=Math.max(12,e.fr.s/10*2.25)*(zoom||1);const y=yawDeg*Math.PI/180,pch=pitchDeg*Math.PI/180;
+  cam.position.set(target.x+d*Math.sin(y)*Math.cos(pch),target.y+d*Math.sin(pch),target.z+d*Math.cos(y)*Math.cos(pch));cam.lookAt(target);
+}
+
+/* ================= THUMBNAILS ================= */
+let visible=new Set(),io;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+function setupCanvases(){
+  if(io)io.disconnect();visible.clear();
+  io=new IntersectionObserver(es=>es.forEach(en=>en.isIntersecting?visible.add(en.target):visible.delete(en.target)),{rootMargin:'80px'});
+  const col=readColors();
+  document.querySelectorAll('canvas[data-i]').forEach(c=>{io.observe(c);drawThumb(c,.5,col,0)});
+}
+function drawThumb(cv,p,col,t){
+  const e=DAYS[current].ex[+cv.dataset.i];if(!e)return;
+  const dpr=Math.min(window.devicePixelRatio||1,2),w=cv.clientWidth||120,px=Math.round(w*dpr);
+  if(cv.width!==px){cv.width=px;cv.height=px}
+  const ctx=cv.getContext('2d');
+  if(!G){draw2D(ctx,e,p,col);return}
+  const target=setScene(e,p,col);
+  const baseYaw=e.view==='front'?58:36;
+  aimCam(G.cam,target,e,baseYaw+Math.sin(t*0.00035)*14,13);G.cam.aspect=1;G.cam.updateProjectionMatrix();
+  G.thumb.render(G.scene,G.cam);
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,px,px);ctx.drawImage(G.thumb.domElement,0,0,px,px);
+}
+
+/* ================= VIEWER ================= */
+let vOpen=false,vEx=null,vYaw=38,vPitch=12,vZoom=1,vSpeed=1,vPaused=false,vClock=0,vLast=0;
+function openViewer(i){
+  const e=DAYS[current].ex[i];vEx=e;vOpen=true;vYaw=e.view==='front'?58:38;vPitch=12;vZoom=1;vPaused=false;
+  $('#vtitle').textContent=e.tr;$('#vpause').textContent='❚❚ Durdur';
+  $('#vviews').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.yaw===vYaw));
+  $('#vbody').innerHTML=`
+    <div class="meta"><span class="sets">${e.sets}</span><button class="btn rest" type="button" id="vrest">⏱ ${fmtRest(e.rest)}</button><span class="en" style="margin:0">${e.en}</span></div>
+    <div class="mapgrid"><div>${exMap(e)}</div><div class="mlist">
+      <div class="legend"><span><i style="background:var(--acc)"></i>Ana kas</span><span><i style="background:var(--acc);opacity:.42"></i>Yardımcı</span></div>
+      ${e.mp.map(k=>`<div class="mrow"><span class="n">${MUS[k]}</span><span class="v">ana</span></div>`).join('')}
+      ${e.ms.map(k=>`<div class="mrow"><span class="n" style="font-weight:500">${MUS[k]}</span><span class="v">yardımcı</span></div>`).join('')}
+    </div></div>
+    <ul class="tips">${e.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+    <div class="links"><a class="btn yt" href="${yt(e.en+' proper form tutorial')}" target="_blank" rel="noopener">▶ Video izle</a>
+    <a class="btn yt alt" href="${yt(e.tr+' nasıl yapılır doğru form')}" target="_blank" rel="noopener">▶ Türkçe anlatım</a></div>`;
+  $('#vrest').onclick=()=>startTimer(e.rest,e.tr);
+  $('#viewer').hidden=false;document.body.style.overflow='hidden';$('#viewer').scrollTop=0;
+  if(G&&!G.viewer){try{const r=new THREE.WebGLRenderer({canvas:$('#vcanvas'),antialias:true,alpha:true});r.setClearColor(0,0);r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;G.viewer=r;G.vcam=new THREE.PerspectiveCamera(35,1,.1,200)}catch(err){G.viewer=null}}
+  $('#vclose').focus();
+}
+function closeViewer(){vOpen=false;$('#viewer').hidden=true;document.body.style.overflow=''}
+$('#vclose').onclick=closeViewer;
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&vOpen)closeViewer()});
+$('#vviews').querySelectorAll('button').forEach(b=>b.onclick=()=>{vYaw=+b.dataset.yaw;vPitch=12;$('#vviews').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+$('#vspeed').querySelectorAll('button').forEach(b=>b.onclick=()=>{vSpeed=+b.dataset.sp;$('#vspeed').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+$('#vpause').onclick=()=>{vPaused=!vPaused;$('#vpause').textContent=vPaused?'▶ Oynat':'❚❚ Durdur'};
+(function drag(){
+  const st=$('#vstage');let ptrs=new Map(),lastDist=0;
+  st.addEventListener('pointerdown',ev=>{st.setPointerCapture(ev.pointerId);ptrs.set(ev.pointerId,[ev.clientX,ev.clientY]);$('#vviews').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',false))});
+  st.addEventListener('pointermove',ev=>{if(!ptrs.has(ev.pointerId))return;const [px,py]=ptrs.get(ev.pointerId);
+    if(ptrs.size===1){vYaw-=(ev.clientX-px)*0.45;vPitch=Math.max(-5,Math.min(70,vPitch+(ev.clientY-py)*0.3))}
+    ptrs.set(ev.pointerId,[ev.clientX,ev.clientY]);
+    if(ptrs.size===2){const [a,b]=[...ptrs.values()];const dd=Math.hypot(a[0]-b[0],a[1]-b[1]);if(lastDist)vZoom=Math.max(.55,Math.min(1.8,vZoom*lastDist/dd));lastDist=dd}});
+  const up=ev=>{ptrs.delete(ev.pointerId);if(ptrs.size<2)lastDist=0};
+  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',ev=>{ev.preventDefault();vZoom=Math.max(.55,Math.min(1.8,vZoom*(1+ev.deltaY*0.001)))},{passive:false});
+})();
+function drawViewer(col){
+  const cv=$('#vcanvas'),e=vEx;const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+  let p;
+  if(reduce.matches&&!vPaused)p=Math.floor(vClock/1800)%2;else p=(1-Math.cos(2*Math.PI*vClock/2800))/2;
+  if(!G||!G.viewer){const dpr=Math.min(devicePixelRatio||1,2);const s=Math.min(w,h);if(cv.width!==Math.round(w*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+    const ctx=cv.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);const off=document.createElement('canvas');off.width=off.height=Math.round(s*dpr);draw2D(off.getContext('2d'),e,p,col);ctx.drawImage(off,(cv.width-off.width)/2,(cv.height-off.height)/2);return}
+  const r=G.viewer;const dpr=Math.min(devicePixelRatio||1,2);
+  if(r.getPixelRatio()!==dpr)r.setPixelRatio(dpr);
+  const sz=r.getSize(new THREE.Vector2());if(sz.x!==w||sz.y!==h)r.setSize(w,h,false);
+  const target=setScene(e,p,col);G.vcam.aspect=w/h;G.vcam.updateProjectionMatrix();
+  aimCam(G.vcam,target,e,vYaw,vPitch,vZoom*(w/h<1?1.45:1.1));r.render(G.scene,G.vcam);
+}
+
+/* ================= LOOP ================= */
+let lastThumb=0;
+function loop(now){
+  const dt=vLast?Math.min(100,now-vLast):16;vLast=now;
+  const col=readColors();
+  if(vOpen){if(!vPaused)vClock+=dt*vSpeed;drawViewer(col)}
+  else if(visible.size&&now-lastThumb>30){lastThumb=now;
+    const p=reduce.matches?Math.floor(now/1800)%2:(1-Math.cos(2*Math.PI*(now%2800)/2800))/2;
+    visible.forEach(c=>drawThumb(c,p,col,reduce.matches?0:now));}
+  requestAnimationFrame(loop);
+}
+
+/* ================= REST TIMER ================= */
+let tEnd=0,tTotal=0,tInt=null,wake=null;
+function startTimer(sec,name){
+  tTotal=sec;tEnd=Date.now()+sec*1000;$('#tlbl').textContent=`Dinlenme · ${name}`;
+  const el=$('#timer');el.hidden=false;el.classList.remove('fin');
+  clearInterval(tInt);tick();tInt=setInterval(tick,250);
+  try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>wake=w).catch(()=>{})}catch(e){}
+}
+function tick(){
+  const left=Math.max(0,tEnd-Date.now()),s=Math.ceil(left/1000);
+  $('#tnum').textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  $('#tbar').style.width=(100*(1-left/(tTotal*1000)))+'%';
+  if(left<=0){clearInterval(tInt);$('#timer').classList.add('fin');$('#tlbl').textContent='Süre doldu, sonraki sete geç!';try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}}
+}
+$('#tplus').onclick=()=>{if($('#timer').classList.contains('fin')){startTimer(30,'ek süre');return}tEnd+=30000;tTotal+=30;tick()};
+$('#tstop').onclick=()=>{clearInterval(tInt);$('#timer').hidden=true;try{wake&&wake.release()}catch(e){}};
+
+/* ================= BOOT ================= */
+init3D();
+renderAllSched();renderDay();requestAnimationFrame(loop);
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+</body></html>
